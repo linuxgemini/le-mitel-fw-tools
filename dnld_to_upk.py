@@ -4,12 +4,12 @@ import os
 import sys
 import shutil
 import tarfile
-import zipencrypt
 import argparse
 import tempfile
+import zipencrypt
+from mitel.errors import NotFoundError
 from mitel.firmware_pw import generate_fw_pw_bundle
 from utils.string import str_to_bytes, print_new_line
-from mitel.errors import NotFoundError
 
 def recursively_add_to_zip(path: str, zip_handle: zipencrypt.ZipFile, password: bytes = None) -> None: # type: ignore
     for root, dirs, files in os.walk(path):
@@ -17,7 +17,7 @@ def recursively_add_to_zip(path: str, zip_handle: zipencrypt.ZipFile, password: 
             print(f"adding \"{file}\"")
             zip_handle.write(os.path.join(root, file),
                              os.path.relpath(os.path.join(root, file),
-                                             os.path.join(path, '..')),
+                                             os.path.join(path, "..")),
                              pwd=password)
 
 if __name__ == "__main__":
@@ -26,7 +26,7 @@ if __name__ == "__main__":
 
     parser.add_argument("dnld_location", type=str, help="location of the unencrypted .dnld file")
 
-    args = parser.parse_args(args=None if sys.argv[1:] else ['--help'])
+    args = parser.parse_args(args=None if sys.argv[1:] else ["--help"])
 
     if args.dnld_location:
         if os.path.isfile(args.dnld_location):
@@ -41,7 +41,7 @@ if __name__ == "__main__":
                 full_temp_dnld_path = os.path.join(tempdir_path, file_name)
                 shutil.copyfile(full_dnld_path, full_temp_dnld_path)
 
-                with tarfile.open(full_temp_dnld_path, 'r:gz') as dnld_archive:
+                with tarfile.open(full_temp_dnld_path, "r:gz") as dnld_archive:
                     dnld_archive.extractall(extract_dir)
 
                 with open(os.path.join(extract_dir, "mddf.ini"), mode="r", encoding="utf-8") as mddf:
